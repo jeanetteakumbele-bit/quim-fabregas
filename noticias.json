@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "2026-12-24-noticia-demo-2c68",
+    "titulo": "Noticia DEMO",
+    "fecha": "2026-12-24",
+    "imagen": "",
+    "pie": "",
+    "resumen": "",
+    "texto": "holahola",
+    "borrador": false
+  }
+]
