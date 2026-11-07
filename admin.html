@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel de noticias</title>
+<script>
+/* ===== Ajustes de este panel (cambian según la web) ===== */
+window.ADMIN = /*CONFIG*/{
+  "owner": "jeanetteakumbele-bit",
+  "rama": "main",
+  "imgBase": "https://fundacionakumbele.org/wp-content/uploads/",
+  "verNoticias": "noticias.html",
+  "credencialWeb": "admin-config.json",
+  "imgWeb": "img/noticias",
+  "sitio": "Quim Fàbregas",
+  "repo": "quim-fabregas",
+  "datos": "noticias.json",
+  "credencial": "admin-config.json",
+  "imgRepo": "img/noticias",
+  "color": "#c4561a"
+}/*FIN*/;
+</script>
+<style>
+:root{--acento:#600b36;--fondo:#f5f3ef;--blanco:#fff;--tinta:#1f1e1d;--suave:#6c6762;--linea:#e2ddd5;--ok:#2f7a4a;--mal:#b3261e;--radio:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--fondo);color:var(--tinta);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit;color:inherit}
+a{color:var(--acento)}
+.oculto{display:none!important}
+.barra{background:var(--blanco);border-bottom:1px solid var(--linea);position:sticky;top:0;z-index:5}
+.barra-fila{max-width:1180px;margin:0 auto;padding:0 16px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.barra h1{font-size:1.05rem;font-weight:650}
+.barra h1 small{display:block;font-size:.72rem;font-weight:500;color:var(--suave);letter-spacing:.06em;text-transform:uppercase}
+.barra nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:999px;padding:.6em 1.15em;background:var(--acento);color:#fff;font-weight:600;cursor:pointer;text-decoration:none;min-height:40px}
+.btn:hover{filter:brightness(1.12)}
+.btn:disabled{opacity:.55;cursor:wait}
+.btn.sec{background:transparent;color:var(--acento);box-shadow:inset 0 0 0 1.5px var(--acento)}
+.btn.peligro{background:transparent;color:var(--mal);box-shadow:inset 0 0 0 1.5px var(--mal)}
+.btn.mini{padding:.35em .9em;min-height:34px;font-size:.9rem}
+.caja{max-width:520px;margin:48px auto;padding:0 16px}
+.tarjeta{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radio);padding:28px}
+.tarjeta h2{font-size:1.35rem;margin-bottom:.4em}
+.tarjeta p{color:var(--suave);margin-bottom:1em}
+.tarjeta ol{margin:0 0 1.2em 1.2em;color:var(--suave)}
+.tarjeta li{margin-bottom:.35em}
+label{display:block;font-weight:600;font-size:.9rem;margin:16px 0 6px}
+label .nota{font-weight:400;color:var(--suave)}
+input[type=text],input[type=password],input[type=date],input[type=url],textarea{width:100%;border:1px solid var(--linea);border-radius:8px;padding:.65em .8em;background:#fff}
+input:focus,textarea:focus{outline:2px solid var(--acento);outline-offset:1px;border-color:transparent}
+textarea{min-height:220px;resize:vertical;line-height:1.55}
+textarea.corto{min-height:80px}
+.fila-btn{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.check{display:flex;align-items:center;gap:8px;font-weight:500;margin-top:18px}
+.mensaje{margin-top:14px;font-size:.92rem;min-height:1.4em}
+.mensaje.mal{color:var(--mal)}
+.mensaje.ok{color:var(--ok)}
+.panel{max-width:1180px;margin:0 auto;padding:24px 16px 64px;display:grid;grid-template-columns:320px 1fr;gap:24px;align-items:start}
+.lista{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden}
+.lista-cab{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--linea)}
+.lista-cab h2{font-size:1rem}
+.lista ul{list-style:none;max-height:70vh;overflow:auto}
+.lista li button{width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--linea);padding:12px 16px;cursor:pointer;display:block}
+.lista li button:hover{background:var(--fondo)}
+.lista li button.activa{background:color-mix(in srgb,var(--acento) 9%,#fff);box-shadow:inset 3px 0 0 var(--acento)}
+.lista .t{font-weight:600;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lista .f{font-size:.82rem;color:var(--suave)}
+.etq{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:#efe6c9;color:#6b5410;border-radius:999px;padding:.1em .6em;margin-left:6px}
+.vacia{padding:22px 16px;color:var(--suave);font-size:.92rem}
+.editor{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--radio);padding:24px 26px 28px}
+.editor h2{font-size:1.25rem}
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.foto-caja{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.foto-prev{width:160px;aspect-ratio:4/3;border-radius:8px;background:var(--fondo) center/cover;border:1px dashed var(--linea);flex:none}
+.foto-ctrl{flex:1;min-width:200px}
+.ayuda{font-size:.84rem;color:var(--suave);margin-top:6px}
+.aviso{background:#fff7e6;border:1px solid #f0d9a8;border-radius:8px;padding:12px 14px;font-size:.88rem;color:#6b5410;margin-top:18px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--tinta);color:#fff;padding:.75em 1.2em;border-radius:999px;font-size:.92rem;box-shadow:0 8px 30px rgba(0,0,0,.2);z-index:10;max-width:calc(100% - 32px)}
+.toast.mal{background:var(--mal)}
+@media (max-width:820px){
+  .panel{grid-template-columns:1fr}
+  .lista ul{max-height:40vh}
+  .dos{grid-template-columns:1fr}
+  .barra h1 small{display:none}
+}
+</style>
+</head>
+<body>
+<header class="barra">
+  <div class="barra-fila">
+    <h1><small>Panel de noticias</small><span id="nombre-sitio"></span></h1>
+    <nav id="nav-panel" class="oculto">
+      <a class="btn mini sec" id="ver-web" target="_blank" rel="noopener">Ver noticias</a>
+      <button class="btn mini sec" id="b-ajustes">Contraseña</button>
+      <button class="btn mini sec" id="b-salir">Salir</button>
+    </nav>
+  </div>
+</header>
+
+<!-- Cargando -->
+<div class="caja" id="v-cargando"><div class="tarjeta"><p>Cargando…</p></div></div>
+
+<!-- Configuración inicial -->
+<div class="caja oculto" id="v-config">
+  <div class="tarjeta">
+    <h2>Configurar el panel</h2>
+    <p>Solo se hace una vez. El panel guarda las noticias directamente en GitHub, así que necesita una llave de acceso limitada a este repositorio. La llave se guarda cifrada con la contraseña que elijas.</p>
+    <ol>
+      <li>Abre <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li>
+      <li>Ponle un nombre, por ejemplo «Panel de noticias», y una caducidad (máximo 1 año).</li>
+      <li>En <b>Repository access</b> elige <b>Only select repositories</b> y marca <b id="repo-nombre"></b>.</li>
+      <li>En <b>Permissions → Repository permissions</b>, pon <b>Contents</b> en <b>Read and write</b>.</li>
+      <li>Pulsa <b>Generate token</b>, copia la llave y pégala aquí.</li>
+    </ol>
+    <form id="f-config" autocomplete="off">
+      <label for="c-token">Llave de GitHub</label>
+      <input type="password" id="c-token" required placeholder="github_pat_…" autocomplete="off">
+      <label for="c-pass">Contraseña del panel <span class="nota">(mínimo 12 caracteres)</span></label>
+      <input type="password" id="c-pass" required minlength="12" autocomplete="new-password">
+      <label for="c-pass2">Repite la contraseña</label>
+      <input type="password" id="c-pass2" required minlength="12" autocomplete="new-password">
+      <div class="aviso">La llave cifrada se guarda en el repositorio público. Con una contraseña larga (una frase de varias palabras) nadie puede descifrarla. Si la olvidas, crea una llave nueva y vuelve a configurar el panel.</div>
+      <div class="fila-btn"><button class="btn" type="submit">Guardar y entrar</button></div>
+      <p class="mensaje" id="m-config" role="status"></p>
+    </form>
+  </div>
+</div>
+
+<!-- Entrar -->
+<div class="caja oculto" id="v-login">
+  <div class="tarjeta">
+    <h2>Entrar</h2>
+    <p>Escribe la contraseña del panel para añadir y editar noticias.</p>
+    <form id="f-login">
+      <label for="l-pass">Contraseña</label>
+      <input type="password" id="l-pass" required autocomplete="current-password" autofocus>
+      <div class="fila-btn"><button class="btn" type="submit">Entrar</button></div>
+      <p class="mensaje" id="m-login" role="status"></p>
+    </form>
+  </div>
+</div>
+
+<!-- Cambiar contraseña -->
+<div class="caja oculto" id="v-ajustes">
+  <div class="tarjeta">
+    <h2>Cambiar contraseña</h2>
+    <p>La llave de GitHub sigue siendo la misma; solo cambia la contraseña con la que se protege. Si quieres usar una llave nueva, pégala también.</p>
+    <form id="f-ajustes" autocomplete="off">
+      <label for="a-token">Llave nueva de GitHub <span class="nota">(opcional)</span></label>
+      <input type="password" id="a-token" placeholder="Déjalo vacío para mantener la actual" autocomplete="off">
+      <label for="a-pass">Contraseña nueva <span class="nota">(mínimo 12 caracteres)</span></label>
+      <input type="password" id="a-pass" required minlength="12" autocomplete="new-password">
+      <label for="a-pass2">Repite la contraseña</label>
+      <input type="password" id="a-pass2" required minlength="12" autocomplete="new-password">
+      <div class="fila-btn"><button class="btn" type="submit">Guardar</button><button class="btn sec" type="button" id="a-cancelar">Volver</button></div>
+      <p class="mensaje" id="m-ajustes" role="status"></p>
+    </form>
+  </div>
+</div>
+
+<!-- Panel -->
+<div class="panel oculto" id="v-panel">
+  <aside class="lista">
+    <div class="lista-cab"><h2>Noticias</h2><button class="btn mini" id="b-nueva">+ Nueva</button></div>
+    <ul id="lista"></ul>
+  </aside>
+  <section class="editor" id="editor">
+    <h2 id="e-titulo-cab">Nueva noticia</h2>
+    <form id="f-noticia">
+      <label for="n-titulo">Título</label>
+      <input type="text" id="n-titulo" required maxlength="160">
+      <div class="dos">
+        <div><label for="n-fecha">Fecha</label><input type="date" id="n-fecha" required></div>
+        <div><label class="check" style="margin-top:44px"><input type="checkbox" id="n-borrador"> Borrador (no se ve en la web)</label></div>
+      </div>
+      <label>Foto <span class="nota">(opcional)</span></label>
+      <div class="foto-caja">
+        <div class="foto-prev" id="n-prev"></div>
+        <div class="foto-ctrl">
+          <input type="file" id="n-archivo" accept="image/*">
+          <p class="ayuda">Se reduce sola a 1600 px y se sube al guardar.</p>
+          <label for="n-imagen" style="margin-top:12px">…o dirección de una foto</label>
+          <input type="text" id="n-imagen" placeholder="https://… o 2026/10/foto.jpg">
+          <label for="n-pie">Pie de foto</label>
+          <input type="text" id="n-pie" maxlength="200">
+        </div>
+      </div>
+      <label for="n-resumen">Resumen <span class="nota">(una o dos frases; se ve en la portada)</span></label>
+      <textarea class="corto" id="n-resumen" maxlength="400"></textarea>
+      <label for="n-texto">Texto</label>
+      <textarea id="n-texto"></textarea>
+      <p class="ayuda">Deja una línea en blanco entre párrafos. <b>**negrita**</b>, <i>*cursiva*</i> y enlaces: [texto](https://…).</p>
+      <div class="fila-btn">
+        <button class="btn" type="submit" id="b-guardar">Guardar y publicar</button>
+        <button class="btn peligro oculto" type="button" id="b-borrar">Borrar</button>
+      </div>
+      <p class="mensaje" id="m-noticia" role="status"></p>
+    </form>
+  </section>
+</div>
+
+<div class="toast oculto" id="toast" role="status"></div>
+
+<script>
+(() => {
+"use strict";
+const C = window.ADMIN;
+const $ = (s) => document.querySelector(s);
+const API = "https://api.github.com";
+document.documentElement.style.setProperty("--acento", C.color || "#600b36");
+$("#nombre-sitio").textContent = C.sitio;
+$("#repo-nombre").textContent = C.owner + "/" + C.repo;
+$("#ver-web").href = C.verNoticias;
+document.title = "Panel de noticias · " + C.sitio;
+
+let token = null;          // solo en memoria
+let noticias = [];
+let actual = null;         // id de la noticia abierta
+let archivoNuevo = null;   // foto elegida pendiente de subir
+
+/* ---------- utilidades ---------- */
+const vistas = ["#v-cargando", "#v-config", "#v-login", "#v-ajustes", "#v-panel"];
+function ver(id) { vistas.forEach(v => $(v).classList.toggle("oculto", v !== id)); $("#nav-panel").classList.toggle("oculto", !token || id === "#v-login"); }
+function msg(el, texto, tipo) { const m = $(el); m.textContent = texto || ""; m.className = "mensaje" + (tipo ? " " + tipo : ""); }
+let tt; function toast(texto, mal) { const t = $("#toast"); t.textContent = texto; t.className = "toast" + (mal ? " mal" : ""); clearTimeout(tt); tt = setTimeout(() => t.classList.add("oculto"), 4200); }
+const b64 = { de: (buf) => { let s = ""; new Uint8Array(buf).forEach(b => s += String.fromCharCode(b)); return btoa(s); },
+              a: (str) => Uint8Array.from(atob(str), c => c.charCodeAt(0)) };
+const utf8ab64 = (txt) => b64.de(new TextEncoder().encode(txt));
+const b64autf8 = (str) => new TextDecoder().decode(b64.a(str.replace(/\s/g, "")));
+const hoy = () => new Date().toISOString().slice(0, 10);
+function slug(t) { return (t || "noticia").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 50) || "noticia"; }
+function rutaFoto(r) { if (!r) return ""; if (/^(https?:)?\/\//.test(r) || r.startsWith("data:") || r.startsWith("blob:")) return r; if (C.imgBase && /^\d{4}\/\d{2}\//.test(r)) return C.imgBase + r; return r; }
+
+/* ---------- cifrado (PBKDF2 + AES-GCM) ---------- */
+const ITER = 600000;
+async function clave(pass, sal) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({ name: "PBKDF2", salt: sal, iterations: ITER, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+async function cifrar(texto, pass) {
+  const sal = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+  const datos = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await clave(pass, sal), new TextEncoder().encode(texto));
+  return { v: 1, kdf: "PBKDF2-SHA256", iter: ITER, sal: b64.de(sal), iv: b64.de(iv), datos: b64.de(datos) };
+}
+async function descifrar(obj, pass) {
+  const k = await clave(pass, b64.a(obj.sal));
+  const plano = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64.a(obj.iv) }, k, b64.a(obj.datos));
+  return new TextDecoder().decode(plano);
+}
+
+/* ---------- GitHub ---------- */
+async function gh(ruta, opciones = {}, tk = token) {
+  const r = await fetch(API + ruta, { ...opciones, cache: "no-store", headers: { "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", ...(tk ? { "Authorization": "Bearer " + tk } : {}), ...(opciones.headers || {}) } });
+  if (!r.ok) { const e = new Error("GitHub " + r.status); e.status = r.status; try { e.detalle = (await r.json()).message; } catch {} throw e; }
+  return r.status === 204 ? null : r.json();
+}
+const rutaRepo = (p) => `/repos/${C.owner}/${C.repo}/contents/${p.split("/").map(encodeURIComponent).join("/")}`;
+async function leer(p, tk = token) {
+  try { const j = await gh(rutaRepo(p) + "?ref=" + C.rama + "&t=" + Date.now(), {}, tk); return { sha: j.sha, texto: b64autf8(j.content) }; }
+  catch (e) { if (e.status === 404) return null; throw e; }
+}
+async function escribir(p, contenidoB64, sha, mensaje, tk = token) {
+  return gh(rutaRepo(p), { method: "PUT", body: JSON.stringify({ message: mensaje, content: contenidoB64, branch: C.rama, ...(sha ? { sha } : {}) }) }, tk);
+}
+async function comprobarToken(tk) {
+  const r = await gh(`/repos/${C.owner}/${C.repo}`, {}, tk);
+  if (!r.permissions || !r.permissions.push) throw new Error("La llave no tiene permiso de escritura en " + C.owner + "/" + C.repo + ".");
+}
+function textoError(e) {
+  if (e.status === 401) return "GitHub no acepta la llave (puede haber caducado). Vuelve a configurar el panel con una llave nueva.";
+  if (e.status === 403 || e.status === 404) return "La llave no tiene acceso a este repositorio con permiso Contents: Read and write.";
+  if (e.status === 409 || e.status === 422) return "Alguien ha cambiado las noticias a la vez. Vuelve a intentarlo.";
+  return e.message + (e.detalle ? " (" + e.detalle + ")" : "");
+}
+
+/* ---------- arranque ---------- */
+let credencial = null;
+async function arrancar() {
+  try {
+    const f = await leer(C.credencial, null);
+    if (f) { credencial = JSON.parse(f.texto); ver("#v-login"); setTimeout(() => $("#l-pass").focus(), 50); }
+    else ver("#v-config");
+  } catch (e) {
+    // sin acceso a la API (límite de peticiones): probar la copia publicada
+    try { const r = await fetch((C.credencialWeb || C.credencial) + "?t=" + Date.now(), { cache: "no-store" }); if (r.ok) { credencial = await r.json(); ver("#v-login"); return; } } catch {}
+    ver("#v-config");
+  }
+}
+
+$("#f-config").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const tk = $("#c-token").value.trim(), p1 = $("#c-pass").value, p2 = $("#c-pass2").value;
+  if (p1.length < 12) return msg("#m-config", "La contraseña debe tener al menos 12 caracteres.", "mal");
+  if (p1 !== p2) return msg("#m-config", "Las contraseñas no coinciden.", "mal");
+  const b = ev.target.querySelector("[type=submit]"); b.disabled = true; msg("#m-config", "Comprobando la llave…");
+  try {
+    await comprobarToken(tk);
+    msg("#m-config", "Cifrando y guardando…");
+    const obj = await cifrar(tk, p1);
+    const prev = await leer(C.credencial, tk);
+    await escribir(C.credencial, utf8ab64(JSON.stringify(obj, null, 2) + "\n"), prev && prev.sha, "Panel de noticias: guardar llave cifrada", tk);
+    credencial = obj; token = tk; $("#f-config").reset();
+    await abrirPanel();
+    toast("Panel configurado.");
+  } catch (e) { msg("#m-config", textoError(e), "mal"); }
+  finally { b.disabled = false; }
+});
+
+$("#f-login").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const b = ev.target.querySelector("[type=submit]"); b.disabled = true; msg("#m-login", "Comprobando…");
+  try { token = await descifrar(credencial, $("#l-pass").value); }
+  catch { b.disabled = false; return msg("#m-login", "Contraseña incorrecta.", "mal"); }
+  try { await comprobarToken(token); $("#f-login").reset(); msg("#m-login", ""); await abrirPanel(); }
+  catch (e) { token = null; msg("#m-login", textoError(e), "mal"); }
+  finally { b.disabled = false; }
+});
+
+$("#b-salir").addEventListener("click", () => { token = null; noticias = []; actual = null; ver("#v-login"); });
+$("#b-ajustes").addEventListener("click", () => { msg("#m-ajustes", ""); ver("#v-ajustes"); });
+$("#a-cancelar").addEventListener("click", () => ver("#v-panel"));
+$("#f-ajustes").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const nuevo = $("#a-token").value.trim(), p1 = $("#a-pass").value, p2 = $("#a-pass2").value;
+  if (p1.length < 12) return msg("#m-ajustes", "La contraseña debe tener al menos 12 caracteres.", "mal");
+  if (p1 !== p2) return msg("#m-ajustes", "Las contraseñas no coinciden.", "mal");
+  const b = ev.target.querySelector("[type=submit]"); b.disabled = true; msg("#m-ajustes", "Guardando…");
+  try {
+    const tk = nuevo || token;
+    if (nuevo) await comprobarToken(nuevo);
+    const obj = await cifrar(tk, p1);
+    const prev = await leer(C.credencial, tk);
+    await escribir(C.credencial, utf8ab64(JSON.stringify(obj, null, 2) + "\n"), prev && prev.sha, "Panel de noticias: cambiar contraseña", tk);
+    credencial = obj; token = tk; $("#f-ajustes").reset();
+    ver("#v-panel"); toast("Contraseña cambiada.");
+  } catch (e) { msg("#m-ajustes", textoError(e), "mal"); }
+  finally { b.disabled = false; }
+});
+
+/* ---------- noticias ---------- */
+async function cargarNoticias() {
+  const f = await leer(C.datos);
+  const lista = f ? JSON.parse(f.texto || "[]") : [];
+  return Array.isArray(lista) ? lista : [];
+}
+const ordenar = (l) => l.slice().sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+async function abrirPanel() {
+  ver("#v-panel");
+  noticias = await cargarNoticias();
+  pintarLista(); nueva();
+}
+function pintarLista() {
+  const ul = $("#lista"); ul.innerHTML = "";
+  if (!noticias.length) { ul.innerHTML = '<li class="vacia">Todavía no hay noticias. Escribe la primera.</li>'; return; }
+  for (const n of ordenar(noticias)) {
+    const li = document.createElement("li"), b = document.createElement("button");
+    b.type = "button"; if (n.id === actual) b.className = "activa";
+    const t = document.createElement("span"); t.className = "t"; t.textContent = n.titulo || "(sin título)";
+    const f = document.createElement("span"); f.className = "f"; f.textContent = n.fecha || "";
+    if (n.borrador) { const e = document.createElement("span"); e.className = "etq"; e.textContent = "Borrador"; f.appendChild(e); }
+    b.append(t, f); b.addEventListener("click", () => abrir(n.id));
+    li.appendChild(b); ul.appendChild(li);
+  }
+}
+function previa(src) { $("#n-prev").style.backgroundImage = src ? `url("${src.replace(/"/g, "%22")}")` : ""; }
+function nueva() {
+  actual = null; archivoNuevo = null; $("#f-noticia").reset();
+  $("#n-fecha").value = hoy(); previa("");
+  $("#e-titulo-cab").textContent = "Nueva noticia"; $("#b-borrar").classList.add("oculto");
+  msg("#m-noticia", ""); pintarLista();
+}
+function abrir(id) {
+  const n = noticias.find(x => x.id === id); if (!n) return;
+  actual = id; archivoNuevo = null; $("#n-archivo").value = "";
+  $("#n-titulo").value = n.titulo || ""; $("#n-fecha").value = n.fecha || hoy();
+  $("#n-borrador").checked = !!n.borrador; $("#n-imagen").value = n.imagen || "";
+  $("#n-pie").value = n.pie || ""; $("#n-resumen").value = n.resumen || ""; $("#n-texto").value = n.texto || "";
+  previa(rutaFoto(n.imagen) ? new URL(rutaFoto(n.imagen), location.href).href : "");
+  $("#e-titulo-cab").textContent = "Editar noticia"; $("#b-borrar").classList.remove("oculto");
+  msg("#m-noticia", ""); pintarLista();
+  if (innerWidth < 820) $("#editor").scrollIntoView({ behavior: "smooth" });
+}
+$("#b-nueva").addEventListener("click", nueva);
+$("#n-imagen").addEventListener("input", () => { archivoNuevo = null; $("#n-archivo").value = ""; const r = rutaFoto($("#n-imagen").value.trim()); previa(r ? new URL(r, location.href).href : ""); });
+$("#n-archivo").addEventListener("change", () => {
+  const f = $("#n-archivo").files[0]; if (!f) return;
+  if (!f.type.startsWith("image/")) { toast("Elige una imagen.", true); return; }
+  archivoNuevo = f; previa(URL.createObjectURL(f));
+});
+
+async function reducir(file) {
+  const bmp = await createImageBitmap(file);
+  const lado = 1600, esc = Math.min(1, lado / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas"); c.width = Math.round(bmp.width * esc); c.height = Math.round(bmp.height * esc);
+  c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+  const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.85));
+  return b64.de(await blob.arrayBuffer());
+}
+
+// Aplica un cambio sobre la versión más reciente del archivo (por si alguien guardó a la vez)
+async function guardarCambio(cambio, mensaje) {
+  for (let intento = 0; intento < 2; intento++) {
+    const f = await leer(C.datos);
+    let lista = f ? JSON.parse(f.texto || "[]") : [];
+    lista = cambio(Array.isArray(lista) ? lista : []);
+    try {
+      await escribir(C.datos, utf8ab64(JSON.stringify(ordenar(lista), null, 2) + "\n"), f && f.sha, mensaje);
+      noticias = lista; return;
+    } catch (e) { if ((e.status === 409 || e.status === 422) && intento === 0) continue; throw e; }
+  }
+}
+
+$("#f-noticia").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const b = $("#b-guardar"); b.disabled = true;
+  try {
+    const titulo = $("#n-titulo").value.trim();
+    let imagen = $("#n-imagen").value.trim();
+    if (archivoNuevo) {
+      msg("#m-noticia", "Subiendo la foto…");
+      const nombre = `${hoy()}-${slug(titulo)}-${Math.random().toString(36).slice(2, 6)}.jpg`;
+      await escribir(`${C.imgRepo}/${nombre}`, await reducir(archivoNuevo), null, "Noticias: subir foto " + nombre);
+      imagen = `${C.imgWeb}/${nombre}`; archivoNuevo = null; $("#n-archivo").value = ""; $("#n-imagen").value = imagen;
+    }
+    msg("#m-noticia", "Guardando…");
+    const id = actual || `${$("#n-fecha").value}-${slug(titulo)}-${Math.random().toString(36).slice(2, 6)}`;
+    const datos = { id, titulo, fecha: $("#n-fecha").value, imagen, pie: $("#n-pie").value.trim(),
+                    resumen: $("#n-resumen").value.trim(), texto: $("#n-texto").value.trim(), borrador: $("#n-borrador").checked };
+    const esNueva = !actual;
+    await guardarCambio(l => { const i = l.findIndex(x => x.id === id); if (i >= 0) l[i] = datos; else l.push(datos); return l; },
+                        (esNueva ? "Noticias: añadir «" : "Noticias: editar «") + titulo + "»");
+    actual = id; abrir(id);
+    msg("#m-noticia", datos.borrador ? "Guardado como borrador." : "Publicado. Aparecerá en la web en 1-2 minutos.", "ok");
+    toast(esNueva ? "Noticia añadida." : "Cambios guardados.");
+  } catch (e) { msg("#m-noticia", textoError(e), "mal"); }
+  finally { b.disabled = false; }
+});
+
+$("#b-borrar").addEventListener("click", async () => {
+  const n = noticias.find(x => x.id === actual); if (!n) return;
+  if (!confirm(`¿Borrar «${n.titulo}»? Se quitará de la web.`)) return;
+  const b = $("#b-borrar"); b.disabled = true; msg("#m-noticia", "Borrando…");
+  try {
+    await guardarCambio(l => l.filter(x => x.id !== n.id), "Noticias: borrar «" + n.titulo + "»");
+    nueva(); toast("Noticia borrada.");
+  } catch (e) { msg("#m-noticia", textoError(e), "mal"); }
+  finally { b.disabled = false; }
+});
+
+window.addEventListener("beforeunload", (e) => { if (archivoNuevo) { e.preventDefault(); e.returnValue = ""; } });
+arrancar();
+})();
+</script>
+</body>
+</html>

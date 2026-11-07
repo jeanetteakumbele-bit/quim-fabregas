@@ -20,7 +20,7 @@
   <div class="contenedor cabecera-fila">
     <a class="firma" href="#inicio">Quim Fàbregas</a>
     <nav class="menu" aria-label="Secciones">
-      <a href="#vida">Vida</a><a href="#mirada">Mirada</a><a href="#series">Series</a><a href="#historias">Historias</a><a href="#trayectoria">Trayectoria</a><a href="#prensa">Prensa</a><a href="#akumbele">Akumbele</a>
+      <a href="#vida">Vida</a><a href="#mirada">Mirada</a><a href="#series">Series</a><a href="#historias">Historias</a><a href="#trayectoria">Trayectoria</a><a href="noticias.html">Noticias</a><a href="#prensa">Prensa</a><a href="#akumbele">Akumbele</a>
     </nav>
   </div>
 </header>
@@ -197,6 +197,16 @@
   </div>
 </section>
 
+<!-- NOTICIAS (se rellena sola desde noticias.json; oculta si no hay ninguna) -->
+<section id="ultimas" hidden>
+  <div class="contenedor">
+    <p class="etiqueta">Noticias</p>
+    <h2>Lo último</h2>
+    <div class="noticias-rejilla" data-noticias="resumen" data-limite="3" data-enlace="noticias.html" data-ocultar="#ultimas" data-img-base="https://fundacionakumbele.org/wp-content/uploads/"></div>
+    <a class="ver-todas" href="noticias.html">Todas las noticias →</a>
+  </div>
+</section>
+
 <!-- PRENSA -->
 <section id="prensa">
   <div class="contenedor">
@@ -238,5 +248,6 @@
     <p class="fuentes">Textos elaborados a partir de la entrevista de Lens Magazine (2021), The Guardian (2023), Volcano Foundation, las fichas de los premios citados y las historias de la Fundación Akumbele. Fotografías: Fundación Akumbele.</p>
   </div>
 </footer>
+<script src="js/noticias.js" defer></script>
 </body>
 </html>

@@ -18,3 +18,9 @@ git push
 ```
 
 En 1-2 minutos los cambios están en internet.
+
+## Noticias
+
+- **Panel:** https://jeanetteakumbele-bit.github.io/quim-fabregas/admin.html (con contraseña).
+- La primera vez pide una llave de GitHub (fine-grained token con *Contents: Read and write* solo para este repositorio) y una contraseña. La llave se guarda cifrada en `admin-config.json`.
+- Las noticias se guardan en `noticias.json` y las fotos en `img/noticias/`. Se ven en `noticias.html` y las tres últimas en la portada.
