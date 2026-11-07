@@ -155,6 +155,30 @@ section{padding:clamp(72px,10vw,140px) 0}
 .noticia-leer{margin-top:auto;padding-top:1rem;font-size:.88rem;font-weight:600;color:var(--naranja)}
 .ver-todas{display:inline-block;margin-top:28px;color:var(--naranja);text-decoration:none;font-weight:600;border-bottom:1px solid currentColor}
 
+/* Redes */
+.redes-seccion{background:var(--negro2)}
+.redes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--linea);border:1px solid var(--linea);margin-top:40px}
+.red{background:var(--negro);padding:30px 28px 28px;display:flex;flex-direction:column}
+.red-cab{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:1.2rem}
+.red-nombre{font-size:.72rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--naranja)}
+.red-usuario{font-size:.85rem;color:var(--gris2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.red-cifra{font-family:var(--serif);font-size:clamp(3rem,6vw,4.4rem);line-height:.95;font-weight:500;font-variant-numeric:lining-nums tabular-nums}
+.cifra b,.linea .anio{font-variant-numeric:lining-nums}
+.red-etq{color:var(--gris);font-size:.92rem;margin-top:.5rem;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.red-var{font-size:.82rem;font-weight:600}
+.red-var.sube{color:#8fd19e}
+.red-var.baja{color:#e8a39b}
+.red-linea{display:block;width:100%;height:56px;margin:22px 0 4px}
+.red-trazo{fill:none;stroke:var(--naranja);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.red-area{fill:var(--naranja);opacity:.1}
+.red-punto{fill:var(--naranja)}
+.red-extra{list-style:none;margin-top:18px;border-top:1px solid var(--linea)}
+.red-extra li{padding:9px 0;border-bottom:1px solid var(--linea);color:var(--gris);font-size:.92rem}
+.red-extra b{color:var(--papel);font-weight:600;margin-right:4px}
+.red-ir{margin-top:auto;padding-top:20px;color:var(--naranja);text-decoration:none;font-weight:600;font-size:.9rem}
+.red-ir:hover{text-decoration:underline}
+.redes-nota{margin-top:18px;font-size:.82rem;color:var(--gris2)}
+
 @media (max-width:960px){
   .noticias-rejilla{grid-template-columns:1fr 1fr}
   .cifras{grid-template-columns:1fr 1fr}

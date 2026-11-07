@@ -1,0 +1,66 @@
+# Cada día lee las métricas de Instagram, Facebook y TikTok y actualiza redes.json.
+# También se puede lanzar a mano: pestaña Actions → «Métricas de redes» → Run workflow.
+name: Métricas de redes
+
+on:
+  schedule:
+    - cron: "17 6 * * *"   # todos los días a las 6:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: redes
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Leer las redes
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          NUEVO_REFRESH_TIKTOK: ${{ runner.temp }}/tiktok_refresh
+        run: python scripts/redes.py
+
+      # Si TikTok renueva su llave, se guarda sola en los secretos
+      # (solo si existe el secreto SECRETS_TOKEN; si no, se avisa).
+      - name: Guardar la llave renovada de TikTok
+        env:
+          GH_TOKEN: ${{ secrets.SECRETS_TOKEN }}
+        run: |
+          [ -f "$RUNNER_TEMP/tiktok_refresh" ] || { echo "TikTok no ha renovado su llave."; exit 0; }
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning title=TikTok::TikTok ha renovado su llave. Vuelve a ejecutar scripts/tiktok_autorizar.py antes de un año, o crea el secreto SECRETS_TOKEN para que se guarde sola."
+          else
+            gh secret set TIKTOK_REFRESH_TOKEN --repo "$GITHUB_REPOSITORY" < "$RUNNER_TEMP/tiktok_refresh"
+            echo "Llave de TikTok actualizada en los secretos."
+          fi
+          rm -f "$RUNNER_TEMP/tiktok_refresh"
+
+      - name: Guardar y publicar
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- redes.json; then
+            echo "Sin cambios en las cifras."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add redes.json
+          git commit -m "Actualizar métricas de redes"
+          git push
+          gh api -X POST "repos/$GITHUB_REPOSITORY/pages/builds" --silent || echo "La web se publicará en la próxima actualización."

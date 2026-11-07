@@ -20,7 +20,7 @@
   <div class="contenedor cabecera-fila">
     <a class="firma" href="#inicio">Quim Fàbregas</a>
     <nav class="menu" aria-label="Secciones">
-      <a href="#vida">Vida</a><a href="#mirada">Mirada</a><a href="#series">Series</a><a href="#historias">Historias</a><a href="#trayectoria">Trayectoria</a><a href="noticias.html">Noticias</a><a href="#prensa">Prensa</a><a href="#akumbele">Akumbele</a>
+      <a href="#vida">Vida</a><a href="#mirada">Mirada</a><a href="#series">Series</a><a href="#historias">Historias</a><a href="#trayectoria">Trayectoria</a><a href="noticias.html">Noticias</a><a href="#redes">Redes</a><a href="#prensa">Prensa</a><a href="#akumbele">Akumbele</a>
     </nav>
   </div>
 </header>
@@ -207,6 +207,17 @@
   </div>
 </section>
 
+<!-- REDES (se rellena sola desde redes.json, que GitHub Actions actualiza cada día; oculta si no hay datos) -->
+<section id="redes" class="redes-seccion" hidden>
+  <div class="contenedor">
+    <p class="etiqueta">Redes</p>
+    <h2>Quim en redes</h2>
+    <p class="suave" style="max-width:52ch">Fotos del terreno, viajes y proyectos, casi a diario. Así crece la comunidad que los sigue.</p>
+    <div class="redes" data-redes data-ocultar="#redes"></div>
+    <p class="redes-nota" data-redes-fecha></p>
+  </div>
+</section>
+
 <!-- PRENSA -->
 <section id="prensa">
   <div class="contenedor">
@@ -249,5 +260,6 @@
   </div>
 </footer>
 <script src="js/noticias.js" defer></script>
+<script src="js/redes.js" defer></script>
 </body>
 </html>
